@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script>
+$(document).ready(function(){
+
+setInterval(function(){
+    $.ajax({
+        type: 'GET',
+        url : "/getMessages/{{room}}/",
+        success: function(response){
+            console.log(response);
+            $("#display").empty();
+            for (var key in response.messages)
+            {
+                var temp="<div class='container darker'><b>"+response.messages[key].user+"</b><p>"+response.messages[key].value+"</p><span class='time-left'>"+response.messages[key].date+"</span></div>";
+                $("#display").append(temp);
+            }
+        },
+        error: function(response){
+            alert('An error occured')
+        }
+    });
+},1000);
+})
+</script>
+
+<h2>Chat Room: {{room}}</h2>
+<h2>User Name: {{username}}</h2>
+
+<div class="container">
+  <section>
+      <div class="form-value">
+        <form id="post-form">
+            {% csrf_token %}
+            <div id="display"></div>
+            <input type="hidden" name="username" id="username" value="{{username}}"/>
+            <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}"/>
+            <div class="inputbox">
+              <input type="text" name="message" id="message" width="100px" placeholder="Type Somethin..."/>
+            </div>
+            <input class="button" type="submit" value="Send">
+        </form>
+      </div>
+  </section>
+</div>
+
+
+</body>
+
+<script type="text/javascript">
+  $(document).on('submit','#post-form',function(e){
+    e.preventDefault();
+
+    $.ajax({
+      type:'POST',
+      url:'/send',
+      data:{
+          username:$('#username').val(),
+          room_id:$('#room_id').val(),
+          message:$('#message').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success: function(data){
+         //alert(data)
+      }
+    });
+    document.getElementById('message').value = ''
+  });
+</script>
+
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: 'poppins',sans-serif;
+        }
+        section{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            
+            background: url('https://a-static.besthdwallpaper.com/fantasy-world-wallpaper-2800x2100-29897_28.jpg')no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+        .form-box{
+            position: relative;
+            width: 400px;
+            height: 450px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+        h2{
+            font-size: 2em;
+            color: #fff;
+            text-align: center;
+        }
+        .inputbox{
+            position: relative;
+            margin: 30px 0;
+            width: 500px;
+            border-bottom: 2px solid #fff;
+        }
+        .inputbox label{
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%);
+            color: #fff;
+            font-size: 1em;
+            pointer-events: none;
+            transition: .5s;
+        }
+        input:focus ~ label,
+        input:valid ~ label{
+        top: -5px;
+        }
+        .inputbox input {
+            width: 100%;
+            height: 50px;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            padding:0 35px 0 5px;
+            color: #fff;
+        }
+        .inputbox ion-icon{
+            position: absolute;
+            right: 8px;
+            color: #fff;
+            font-size: 1.2em;
+            top: 20px;
+        }
+        .forget{
+            margin: -15px 0 15px ;
+            font-size: .9em;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;  
+        }
+
+        .forget label input{
+            margin-right: 3px;
+            
+        }
+        .forget label a{
+            color: #fff;
+            text-decoration: none;
+        }
+        .forget label a:hover{
+            text-decoration: underline;
+        }
+        
+        .button{
+            width: 100%;
+            height: 40px;
+            border-radius: 40px;
+            background: #fff;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        .register{
+            font-size: .9em;
+            color: #fff;
+            text-align: center;
+            margin: 25px 0 10px;
+        }
+        .register p a{
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        .register p a:hover{
+            text-decoration: underline;
+        }
+
+        #display{
+          color: white;
+          width: 500px;
+          background: transparent;
+          border: 2px solid rgba(255,255,255,0.5);
+          border-radius: 20px;
+          backdrop-filter: blur(15px);
+          font-family: arial;
+          text-align: center;
+        }
+
+      body{
+        background: url('https://a-static.besthdwallpaper.com/fantasy-world-wallpaper-2800x2100-29897_28.jpg')no-repeat;
+        background-size: cover;
+        background-position: center;
+      }
+</style>
+
+</html>
